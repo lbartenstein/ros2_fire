@@ -4,10 +4,8 @@ import logging
 import threading
 from ultralytics import YOLO
 
-# **پیکربندی لاگینگ**
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
-# **تنظیمات پیش‌فرض**
 config = {
     "RESULTS_FOLDER": "results",
     "UPLOAD_FOLDER": "uploads",
@@ -26,12 +24,10 @@ config = {
 # Define the order of models for detection (7, 4, 2)
 detection_order = [config['DEFAULT_MODEL'], "Model 4", "Model 2"]
 
-# **بارگیری مدل‌های YOLO در startup**
 yolo_models = {}
 model_lock = threading.Lock()
 
 def load_yolo_models():
-    """ بارگیری مدل‌های YOLO و ذخیره در دیکشنری yolo_models. """
     global yolo_models, model_lock
     for model_name, model_path in config['AVAILABLE_MODELS'].items():
         full_model_path = os.path.join(os.getcwd(), model_path)
@@ -46,17 +42,13 @@ def load_yolo_models():
             logging.error(f"Error loading model '{model_name}' from {full_model_path}: {e}")
 
 def get_config():
-    """ تابع دسترسی به config. """
     return config
 
 def get_detection_order():
-    """ تابع دسترسی به detection_order. """
     return detection_order
 
 def get_yolo_models():
-    """ تابع دسترسی به yolo_models. """
     return yolo_models
 
 def get_model_lock():
-    """ تابع دسترسی به model_lock. """
     return model_lock

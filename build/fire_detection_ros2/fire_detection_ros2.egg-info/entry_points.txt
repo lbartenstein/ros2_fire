@@ -1,2 +1,3 @@
 [console_scripts]
 webcam_fire = fire_detection_ros2.webcam_fire:main
+

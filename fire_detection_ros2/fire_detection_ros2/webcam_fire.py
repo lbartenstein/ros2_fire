@@ -46,6 +46,7 @@ class FireDetectorNode(Node): # ROS2
         except Exception as e:
             self.get_logger().error(f'Could not convert image message to cv2: {e}')
             return
+        # if something is detected, frame is altered. Else, frame stays the same
         processed_frame = self.process_frame(cv_image)
         cv2.imshow(self.window_name, processed_frame)
         cv2.waitKey(1)
@@ -58,6 +59,7 @@ class FireDetectorNode(Node): # ROS2
 
         cv2.imshow(self.window_name, processed_frame) 
         cv2.waitKey(1) 
+
 
     def process_frame(self, frame):
         """
@@ -153,6 +155,8 @@ class FireDetectorNode(Node): # ROS2
                 else:
                     label = f"{self.yolo_models[model_name].names[class_id]} {confidence:.2f}" 
                 x1, y1, x2, y2 = map(int, box)
+                # pub x1, x2, y1, y2 
+
                 cv2.rectangle(processed_frame, (x1, y1), (x2, y2), (0, 255, 0), 2)
                 cv2.putText(processed_frame, label, (x1, y1 - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.9, (0, 255, 0), 2)
 
@@ -166,6 +170,6 @@ def main(args=None):
     fire_detector_node.destroy_node()
     rclpy.shutdown()
     cv2.destroyAllWindows() 
-    
+
 if __name__ == '__main__':
     main()
