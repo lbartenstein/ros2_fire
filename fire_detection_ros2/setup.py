@@ -10,18 +10,18 @@ setup(
         ('share/ament_index/resource_index/packages',
             ['resource/' + package_name]),
         ('share/' + package_name, ['package.xml']),
-        ('share/' + package_name + '/launch', ['launch/fire_detection.launch.py']), # اضافه کردن فایل launch
+        ('share/' + package_name + '/launch', ['launch/fire_detection.launch.py']), # launch
     ],
     install_requires=['setuptools'],
     zip_safe=True,
-    maintainer='Ali Alipour', # اسم خودتون رو بزارید
-    maintainer_email='a.alipour@ostfalia.de', # ایمیل خودتون رو بزارید
-    description='ROS2 package for fire detection using YOLO', # توضیحات بسته
-    license='TODO: License declaration', # لایسنس رو مشخص کنید
+    maintainer='Ali Alipour', 
+    maintainer_email='a.alipour@ostfalia.de', 
+    description='ROS2 package for fire detection using YOLO', 
+    license='TODO: License declaration', 
     tests_require=['pytest'],
     entry_points={
         'console_scripts': [
-            'webcam_fire = fire_detection_ros2.webcam_fire:main', # فایل اجرایی
+            'webcam_fire = fire_detection_ros2.webcam_fire:main', 
         ],
     },
 )
