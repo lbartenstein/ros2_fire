@@ -20,7 +20,7 @@ class FireDetectorNode(Node): # ROS2
         self.bridge = CvBridge()
         self.image_subscription = self.create_subscription(
             Image,
-            '/image_raw',  
+            '/image',  
             self.image_callback,
             10)
         self.image_subscription  
@@ -37,6 +37,7 @@ class FireDetectorNode(Node): # ROS2
 
         self.window_name = 'Fire Detection'  
         cv2.namedWindow(self.window_name, cv2.WINDOW_NORMAL) 
+        logging.info('end of init reached')
 
     def image_callback(self, msg):
         self.get_logger().info("Image received on /image_raw topic!")
@@ -46,6 +47,12 @@ class FireDetectorNode(Node): # ROS2
         except Exception as e:
             self.get_logger().error(f'Could not convert image message to cv2: {e}')
             return
+        logging.info('callback reached')
+
+        # capture = cv2.VideoCapture("/dev/video2")
+        # ret, cv_image = capture.read()
+        
+        # if something is detected, frame is altered. Else, frame stays the same
         processed_frame = self.process_frame(cv_image)
         cv2.imshow(self.window_name, processed_frame)
         cv2.waitKey(1)
@@ -59,10 +66,12 @@ class FireDetectorNode(Node): # ROS2
         cv2.imshow(self.window_name, processed_frame) 
         cv2.waitKey(1) 
 
+
     def process_frame(self, frame):
         """
         
         """
+        logging.info('process frame reached')
         resized_frame = cv2.resize(frame, (640, 640))
         height, width, channels = resized_frame.shape
         slice_height = 640 // 2
@@ -87,8 +96,10 @@ class FireDetectorNode(Node): # ROS2
                     continue
                 with self.model_lock: # self.model_lock
                     results = self.yolo_models[model_name](processed_input_image) # self.yolo_models
+                    logging.info('model_lock reached')
                 if results and results[0].boxes.shape[0] > 0:
                     detected_model = model_name
+                    logging.info(f'mode name is {model_name}')
                     break
 
             if detected_model and results and results[0].boxes.shape[0] > 0:
@@ -140,8 +151,9 @@ class FireDetectorNode(Node): # ROS2
                     'class_id': class_ids_all[i],
                     'model_name': model_names_all[i]
                 })
-
         processed_frame = resized_frame.copy() 
+        logging.info(f'processed frame after copy is {processed_frame}')
+
         if filtered_results:
             for res in filtered_results:
                 box = res['box']
@@ -153,9 +165,12 @@ class FireDetectorNode(Node): # ROS2
                 else:
                     label = f"{self.yolo_models[model_name].names[class_id]} {confidence:.2f}" 
                 x1, y1, x2, y2 = map(int, box)
+                # pub x1, x2, y1, y2 
+
                 cv2.rectangle(processed_frame, (x1, y1), (x2, y2), (0, 255, 0), 2)
                 cv2.putText(processed_frame, label, (x1, y1 - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.9, (0, 255, 0), 2)
-
+                logging.info(f'processed frame after adding stuff is {processed_frame}')
+                
         return processed_frame
 
 def main(args=None):
@@ -166,6 +181,6 @@ def main(args=None):
     fire_detector_node.destroy_node()
     rclpy.shutdown()
     cv2.destroyAllWindows() 
-    
+
 if __name__ == '__main__':
     main()
